@@ -1,0 +1,29 @@
+version: '2'
+
+services:
+    mongo:
+        image: mongo
+        ports:
+            - "27017:27017"
+        volumes:
+            - ./data:/data/db
+    back:
+        command: bash -c "npm i && npm run dev"
+        build: .
+        volumes:
+            - ./backend:/usr/src/app
+        ports:
+            - "3004:3004"
+        environment:
+            - SERVER_PORT=3004
+            - MONGO_DB_URI=mongodb://mongo:27017/
+        depends_on:
+            - mongo
+    front:
+        image: nginx:1.13
+        ports:
+            - 80:80
+        volumes:
+            - ./app/public/:/usr/share/nginx/html
+        depends_on:
+            - back
